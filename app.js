@@ -1,4 +1,3 @@
-// app.js
 const express = require("express");
 const cors = require("cors");
 const db = require("./models/db"); // conexión a MySQL
@@ -15,7 +14,7 @@ app.get("/", (req, res) => {
 
 // Ruta oficial de usuarios
 app.get("/usuarios", (req, res) => {
-  console.log("➡️ GET /usuarios recibido en puerto 3001");
+  console.log("GET /usuarios recibido en puerto 3001");
 
   const sql = "SELECT * FROM usuarios";
 
@@ -31,7 +30,7 @@ app.get("/usuarios", (req, res) => {
       });
     }
 
-    res.json(results); // 👈 aquí ya vienen tus usuarios reales
+    res.json(results); 
   });
 });
 

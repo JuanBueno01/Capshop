@@ -1,5 +1,5 @@
 const request = require("supertest");
-const app = require("../login_server"); // 👈 importante el .. porque el test está en /test
+const app = require("../login_server"); 
 
 describe("Pruebas del LOGIN", () => {
   test("Login correcto con credenciales válidas", async () => {
@@ -7,7 +7,7 @@ describe("Pruebas del LOGIN", () => {
       .post("/login")
       .send({
         correo: "juan@gmail.com",
-        contrasena: "1234", // la que tienes en la BD
+        contrasena: "1234", 
       });
 
     expect(res.statusCode).toBe(200);
@@ -33,7 +33,7 @@ describe("Pruebas del LOGIN", () => {
       .post("/login")
       .send({
         correo: "juan@gmail.com",
-        // sin contrasena
+        
       });
 
     expect(res.statusCode).toBe(400);

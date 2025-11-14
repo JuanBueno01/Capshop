@@ -1,46 +1,23 @@
-// server_debug.js
+
 const express = require("express");
 const cors = require("cors");
-const db = require("./models/db"); // conexión a MySQL
+const db = require("./models/db");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// Ruta raíz, solo para probar
-app.get("/", (req, res) => {
-  res.send("SERVIDOR DEBUG EN PUERTO 4000");
-});
 
-// Ruta para ver usuarios (por si quieres seguir probando)
-app.get("/usuarios-debug", (req, res) => {
-  const sql = "SELECT * FROM usuarios";
-
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error("Error al obtener usuarios:", err);
-      return res.status(500).json({
-        ok: false,
-        mensaje: "Error en la base de datos",
-      });
-    }
-
-    res.json(results);
-  });
-});
-
-// 🔐 LOGIN
-// Espera: { "correo": "juan@gmail.com", "contrasena": "1234" }
 app.post("/login", (req, res) => {
   const { correo, contrasena } = req.body;
 
-  console.log("📥 Body recibido en /login:", req.body);
+  console.log("Body recibido en /login:", req.body);
 
-  if (!correo || !contrasena) {
+  if (correo || contrasena) {
     return res.status(400).json({
       ok: false,
-      mensaje: "Faltan campos: correo y contrasena",
+      mensaje: "Faltan campos obligatorios",
     });
   }
 
@@ -48,14 +25,14 @@ app.post("/login", (req, res) => {
 
   db.query(sql, [correo, contrasena], (err, results) => {
     if (err) {
-      console.error("❌ Error en login:", err);
+      console.error(" Error en la consulta:", err);
       return res.status(500).json({
         ok: false,
         mensaje: "Error en la base de datos",
       });
     }
 
-    console.log("🔎 Resultados login:", results);
+    console.log("Resultados login:", results);
 
     if (results.length === 0) {
       return res.status(401).json({
@@ -65,9 +42,9 @@ app.post("/login", (req, res) => {
     }
 
     const usuario = results[0];
-    delete usuario.contraseña; // no mandamos la contraseña al front
+    delete usuario.contraseña;
 
-    res.json({
+    return res.json({
       ok: true,
       mensaje: "Login correcto",
       usuario,
@@ -78,8 +55,7 @@ app.post("/login", (req, res) => {
 const PORT = 4000;
 
 app.listen(PORT, () => {
-  console.log(`CAPSHOP API escuchando en http://localhost:${PORT}`);
+  console.log(`CAPXHOP API escuchando en http://localhost:${PORT}`);
 });
 
-// Esto nos sirve luego para tests
 module.exports = app;

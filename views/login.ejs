@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login CAPXHOP</title>
+  </head>
+  <body>
+    <h1>Login CAPXHOP</h1>
+
+    <% if (error) { %>
+      <p style="color: red;"><%= error %></p>
+    <% } %>
+
+    <form action="/login" method="POST">
+      <input type="email" name="correo" placeholder="Correo" />
+      <input type="password" name="contrasena" placeholder="Contraseña" />
+      <button type="submit">Ingresar</button>
+    </form>
+  </body>
+</html>
