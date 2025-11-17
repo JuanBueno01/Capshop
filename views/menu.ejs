@@ -1,17 +1,307 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Menú principal CAPXHOP</title>
-  </head>
-  <body>
-    <h1>Menú principal CAPXHOP</h1>
-    <p>Bienvenido, <strong><%= usuario.nombre %></strong> (rol: <%= usuario.rol %>)</p>
+<head>
+    <meta charset="UTF-8">
+    <title>CapShop - Menú</title>
 
-    <ul>
-      <li><a href="#">Gestión de productos</a></li>
-      <li><a href="#">Listado de usuarios</a></li>
-      <li><a href="#">Reportes</a></li>
-    </ul>
-  </body>
+    <style>
+        /* ============================
+          FONDO PERRO DIFUMINADO
+        ============================ */
+        body::before {
+          content: "";
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url("/img/perro.jpg");
+          background-size: 75%;
+          background-position: center;
+          background-repeat: no-repeat;
+          background-attachment: fixed;
+          z-index: -2;
+        }
+
+        body::after {
+          content: "";
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: white;
+          opacity: 0.65;
+          z-index: -1;
+          pointer-events: none;
+        }
+
+        body {
+          margin: 0;
+          font-family: Arial, sans-serif;
+          position: relative;
+          z-index: 0;
+        }
+
+        /* ============================
+          NAVBAR
+        ============================ */
+        .navbar {
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 18px 40px;
+          background: rgba(255, 255, 255, 0.25);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          position: sticky;
+          top: 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .nav-left {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .logo {
+          width: 77px;
+          height: 77px;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+
+        .brand {
+          font-weight: bold;
+          font-size: 26px;
+          color: #6a00d7;
+        }
+
+        .nav-links a {
+          margin: 0 14px;
+          text-decoration: none;
+          color: #222;
+          font-weight: 700;
+        }
+
+        .nav-links a:hover {
+          color: #6a00d7;
+        }
+
+        .user-tag {
+          margin-right: 35px;
+        }
+
+        .btn-logout {
+          padding: 8px 14px;
+          background: #6a00d7;
+          color: white;
+          border-radius: 8px;
+          text-decoration: none;
+        }
+
+        /* ============================
+          BANNER PRINCIPAL
+        ============================ */
+        .banner {
+          text-align: left;
+          margin-top: 40px;
+          width: 85%;
+          margin-left: 40px;
+        }
+
+        .banner h1 {
+          font-size: 40px;
+          color: #111;
+          margin-bottom: 10px;
+        }
+
+        .banner p {
+          color: #555;
+          margin-bottom: 20px;
+          font-size: 18px;
+        }
+
+        .cta {
+          padding: 14px 26px;
+          background: #6a00d7;
+          color: white;
+          text-decoration: none;
+          border-radius: 10px;
+          font-size: 16px;
+        }
+
+        /* ============================
+          FILTROS
+        ============================ */
+        .filters {
+          margin: 40px auto;
+          width: 85%;
+          display: flex;
+          justify-content: center;
+          gap: 15px;
+        }
+
+        .filters input,
+        .filters select {
+          padding: 12px;
+          border-radius: 10px;
+          border: 1px solid #aaa;
+        }
+
+        .filters input {
+          width: 300px;
+        }
+
+        /* ============================
+          GRID DE PRODUCTOS
+        ============================ */
+        .grid {
+          width: 90%;
+          margin: auto;
+          display: grid;
+          grid-template-columns: repeat(4, 220px); /* más pequeñas */
+          justify-content: center; /* centra todo */
+          gap: 25px;
+          padding-bottom: 50px;
+        }
+
+        .card {
+          background: white;
+          border-radius: 15px;
+          padding: 15px;
+          text-align: left;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .card img {
+          width: 100%;
+          border-radius: 12px;
+        }
+
+        .card h3 {
+          margin: 10px 0 5px;
+        }
+
+        .price {
+          color: #6a00d7;
+          font-weight: bold;
+        }
+
+        /* ============================
+          BOTONES LADO A LADO
+        ============================ */
+        .card-buttons {
+          display: flex;
+          gap: 10px;
+          margin-top: 12px;
+        }
+
+        .btn-add,
+        .btn-detail {
+          width: 50%; /* uno al lado del otro */
+          padding: 10px;
+          border-radius: 8px;
+          cursor: pointer;
+        }
+
+        .btn-add {
+          border: none;
+          background: #6a00d7;
+          color: white;
+        }
+
+        .btn-detail {
+          border: 2px solid #6a00d7;
+          color: #6a00d7;
+          background: white;
+        }
+
+        /* ============================
+          PAGINACIÓN
+        ============================ */
+        .pagination {
+          text-align: center;
+          margin: 20px 0;
+        }
+
+        .pagination span {
+          margin: 0 7px;
+          padding: 8px 12px;
+          border-radius: 6px;
+          cursor: pointer;
+        }
+
+        .pagination .active {
+          background: #6a00d7;
+          color: white;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <div class="nav-left">
+            <img src="/img/perro.jpg" class="logo">
+            <h2 class="brand">CapXhop</h2>
+        </div>
+
+        <nav class="nav-links">
+            <a href="#">Inicio</a>
+            <a href="#">Catálogo</a>
+            <a href="#">Carrito</a>
+        </nav>
+
+        <div class="nav-right">
+            <span class="user-tag">Bienvenido, <%= userName || "Invitado" %></span>
+            <a href="/logout" class="btn-logout">Cerrar sesión</a>
+        </div>
+    </header>
+
+    <!-- BANNER -->
+    <section class="banner">
+        <h1>Gorras para todos los estilos</h1>
+        <p>Envío gratis en compras superiores a $52.900</p>
+        <a class="cta" href="#">Ver catálogo</a>
+    </section>
+
+    <!-- SEARCH / FILTER BAR -->
+    <section class="filters">
+        <input type="text" placeholder="Buscar gorras, marca o categoría...">
+        <select><option>Categoría</option></select>
+        <select><option>Precio</option></select>
+        <select><option>Más populares</option></select>
+    </section>
+
+    <!-- PRODUCT GRID -->
+    <section class="grid">
+        <% products.forEach(p => { %>
+            <div class="card">
+              <img src="<%= p.img %>" alt="<%= p.name %>">
+              <h3><%= p.name %></h3>
+              <p class="price"><%= p.price %></p>
+              <p class="desc"><%= p.desc %></p>
+
+              <div class="card-buttons">
+                  <button class="btn-add">Agregar al carrito</button>
+                  <button class="btn-detail">Ver detalle</button>
+              </div>
+            </div>
+        <% }) %>
+    </section>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+        <span class="active">1</span>
+        <span>2</span>
+        <span>3</span>
+        <span>...</span>
+    </div>
+
+</body>
 </html>

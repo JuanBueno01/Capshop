@@ -1,61 +1,53 @@
-
 const express = require("express");
 const cors = require("cors");
-const db = require("./models/db");
+const path = require("path");
 
 const app = express();
 
+// Middlewares
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// =========================
+// CONFIGURAR VISTAS (EJS)
+// =========================
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
-app.post("/login", (req, res) => {
-  const { correo, contrasena } = req.body;
+// =========================
+// ARCHIVOS ESTÁTICOS
+// =========================
+app.use(express.static(path.join(__dirname, "public")));
 
-  console.log("Body recibido en /login:", req.body);
+// =========================
+// IMPORTAR CONTROLADORES Y RUTAS
+// =========================
+const userRoutes = require("./routes/userRoutes");
+const productController = require("./controllers/productController");
 
-  if (correo || contrasena) {
-    return res.status(400).json({
-      ok: false,
-      mensaje: "Faltan campos obligatorios",
-    });
-  }
+// =========================
+// RUTAS
+// =========================
+app.use("/", userRoutes);  // login, logout, etc.
+app.use("/usuarios", userRoutes); // opcional
 
-  const sql = "SELECT * FROM usuarios WHERE correo = ? AND contraseña = ?";
+// RUTA MENU EJS
+app.get("/menu", productController.getMenu);
 
-  db.query(sql, [correo, contrasena], (err, results) => {
-    if (err) {
-      console.error(" Error en la consulta:", err);
-      return res.status(500).json({
-        ok: false,
-        mensaje: "Error en la base de datos",
-      });
-    }
-
-    console.log("Resultados login:", results);
-
-    if (results.length === 0) {
-      return res.status(401).json({
-        ok: false,
-        mensaje: "Correo o contraseña incorrectos",
-      });
-    }
-
-    const usuario = results[0];
-    delete usuario.contraseña;
-
-    return res.json({
-      ok: true,
-      mensaje: "Login correcto",
-      usuario,
-    });
-  });
+// =========================
+// RUTA PRINCIPAL
+// =========================
+app.get("/", (req, res) => {
+  res.send("CapShop API funcionando");
 });
 
+// =========================
+// SERVER
+// =========================
 const PORT = 4000;
-
 app.listen(PORT, () => {
-  console.log(`CAPXHOP API escuchando en http://localhost:${PORT}`);
+  console.log(`CAPSHOP API escuchando en http://localhost:${PORT}`);
 });
 
 module.exports = app;
