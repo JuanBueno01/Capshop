@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse - CapShop</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #fff;
+            font-family: Arial, sans-serif;
+
+            background-image: url("/img/perro.jpg");
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: 60%;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: white;
+            opacity: 0.8;
+            z-index: -1;
+        }
+
+        .login-container {
+            width: 380px;
+            margin: 120px auto;
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(25px);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        h2 { margin-bottom: 10px; }
+        .subtitle { opacity: .7; margin-bottom: 20px; }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.85);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 12px;
+            background: #007bff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover { opacity: .9; }
+
+        .link {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .link a {
+            text-decoration: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Registrarse</h2>
+        <p class="subtitle">Crea tu cuenta</p>
+
+        <% if (error) { %>
+            <p style="color:red; text-align:center;"><%= error %></p>
+        <% } %>
+
+        <form action="/register" method="POST">
+            <input type="text" name="nombre" placeholder="Nombre completo">
+            <input type="email" name="correo" placeholder="Correo">
+            <input type="password" name="contrasena" placeholder="Contraseña">
+            <button type="submit">Crear cuenta</button>
+        </form>
+
+        <div class="link">
+            <a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
+        </div>
+    </div>
+
+</body>
+</html>

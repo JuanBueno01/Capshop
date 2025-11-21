@@ -1,3 +1,5 @@
+// models/userModel.js
+
 const db = require("./db");
 
 // Registrar un nuevo usuario
@@ -11,4 +13,10 @@ const obtenerUsuarios = (callback) => {
   db.query("SELECT * FROM usuarios", callback);
 };
 
-module.exports = { crearUsuario, obtenerUsuarios };
+// Login de usuario
+const login = (correo, contrasena, callback) => {
+  const sql = "SELECT * FROM usuarios WHERE correo = ? AND contraseña = ?";
+  db.query(sql, [correo, contrasena], callback);
+};
+
+module.exports = { crearUsuario, obtenerUsuarios, login };
