@@ -1,20 +1,19 @@
 const mysql = require("mysql2");
 
-// Configuración de conexión
 const db = mysql.createConnection({
-  host: "localhost",
+  host: "127.0.0.1",
   user: "root",
   password: "",
   database: "capshop",
+  port: 3306
 });
 
-// Intentar conexión al iniciar
 db.connect((err) => {
   if (err) {
-    console.error("Error al conectar con MySQL:", err.message);
-  } else {
-    console.log("Conexión a MySQL establecida correctamente.");
+    console.error(" Error conectando a MySQL:", err);
+    return;
   }
+  console.log("Conectado a MySQL correctamente en puerto 3306");
 });
 
 module.exports = db;

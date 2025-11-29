@@ -1,51 +1,72 @@
+console.log(" Cargando productRoutes.js");
+
 const express = require("express");
 const router = express.Router();
+
+// Usa tu modelo de MySQL, NO mongoose
 const productModel = require("../models/productModel");
 
-// Obtener todos los productos
-router.get("/", (req, res) => {
-  productModel.obtenerProductos((err, resultados) => {
-    if (err) return res.status(500).send("Error al obtener productos");
-    res.json(resultados);
-  });
-});
-
-// Obtener producto por ID
-router.get("/:id", (req, res) => {
+// ==========================================
+// 🛒 AGREGAR PRODUCTO AL CARRITO
+// ==========================================
+router.post("/add-to-cart/:id", (req, res) => {
   const id = req.params.id;
+  console.log("Agregando producto al carrito:", id);
+
   productModel.obtenerProductoPorId(id, (err, resultado) => {
-    if (err) return res.status(500).send("Error al obtener producto");
-    if (resultado.length === 0) return res.status(404).send("Producto no encontrado");
-    res.json(resultado[0]);
+    if (err || resultado.length === 0) {
+      console.log("Error obteniendo producto:", err);
+      return res.redirect("/menu");
+    }
+
+    const product = resultado[0];
+
+    const cart = req.session.cart;
+
+    // Ver si ya existe
+    let exists = cart.find(item => item.id == id);
+
+    if (exists) {
+      exists.quantity++;
+    } else {
+      cart.push({
+        id: product.id_producto,
+        name: product.nombre,
+        price: product.precio,
+        image: `/img/${product.imagen}`,
+        quantity: 1
+      });
+    }
+
+    return res.redirect("/carrito");
   });
 });
 
-// Crear nuevo producto
-router.post("/", (req, res) => {
-  const nuevoProducto = req.body;
-  productModel.crearProducto(nuevoProducto, (err, resultado) => {
-    if (err) return res.status(500).send("Error al crear producto");
-    res.json({ mensaje: "Producto agregado correctamente", id: resultado.insertId });
-  });
+
+
+//  AUMENTAR CANTIDAD
+
+router.post("/cart/increase/:id", (req, res) => {
+  const item = req.session.cart.find(p => p.id == req.params.id);
+  if (item) item.quantity++;
+  res.redirect("/carrito");
 });
 
-// Actualizar producto
-router.put("/:id", (req, res) => {
-  const id = req.params.id;
-  const datosActualizados = req.body;
-  productModel.actualizarProducto(id, datosActualizados, (err) => {
-    if (err) return res.status(500).send("Error al actualizar producto");
-    res.json({ mensaje: "Producto actualizado correctamente" });
-  });
+
+//  DISMINUIR CANTIDAD
+
+router.post("/cart/decrease/:id", (req, res) => {
+  const item = req.session.cart.find(p => p.id == req.params.id);
+  if (item && item.quantity > 1) item.quantity--;
+  res.redirect("/carrito");
 });
 
-// Eliminar producto
-router.delete("/:id", (req, res) => {
-  const id = req.params.id;
-  productModel.eliminarProducto(id, (err) => {
-    if (err) return res.status(500).send("Error al eliminar producto");
-    res.json({ mensaje: "Producto eliminado correctamente" });
-  });
+
+// ELIMINAR PRODUCTO
+
+router.post("/cart/remove/:id", (req, res) => {
+  req.session.cart = req.session.cart.filter(p => p.id != req.params.id);
+  res.redirect("/carrito");
 });
 
 module.exports = router;

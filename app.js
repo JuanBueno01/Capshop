@@ -1,41 +1,43 @@
 const express = require("express");
-const cors = require("cors");
-const db = require("./models/db"); // conexión a MySQL
-
+const session = require("express-session");
+const path = require("path");
 const app = express();
 
-app.use(cors());
+// Middleware para leer datos POST
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Ruta raíz
-app.get("/", (req, res) => {
-  res.send("CAPSHOP API corriendo con MySQL (PUERTO 3001)");
-});
-
-// Ruta oficial de usuarios
-app.get("/usuarios", (req, res) => {
-  console.log("GET /usuarios recibido en puerto 3001");
-
-  const sql = "SELECT * FROM usuarios";
-
-  db.query(sql, (err, results) => {
-    console.log("   err    ->", err);
-    console.log("   results->", results);
-
-    if (err) {
-      return res.status(500).json({
-        mensaje: "Error en la base de datos",
-        code: err.code,
-        sqlMessage: err.sqlMessage,
-      });
+// Sesiones
+app.use(
+    session({
+        secret: "capshop-secret",
+        resave: false,
+        saveUninitialized: false,
+    })
+);
+app.use((req, res, next) => {
+    if (!req.session.cart) {
+        req.session.cart = [];
+        console.log(" Carrito inicializado en sesión");
     }
-
-    res.json(results); 
-  });
+    next();
 });
+// Static files
+app.use(express.static(path.join(__dirname, "public")));
 
-const PORT = 3001;
+// EJS
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
-app.listen(PORT, () => {
-  console.log(`CAPSHOP API escuchando en http://localhost:${PORT}`);
+// Rutas
+const userRoutes = require("./routes/userRoutes");
+const productRoutes = require("./routes/productRoutes");
+const viewRoutes = require("./routes/viewRoutes");
+
+app.use("/", userRoutes);
+app.use("/", productRoutes);
+app.use("/", viewRoutes);
+
+app.listen(3001, () => {
+    console.log("Servidor corriendo en http://localhost:3001");
 });

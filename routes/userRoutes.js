@@ -1,155 +1,121 @@
+console.log(" EJECUTANDO userRoutes.js --- LLEGÓ AQUÍ");
+
+
+
 const express = require("express");
 const router = express.Router();
 const db = require("../models/db");
 const crypto = require("crypto");
 
-// ======================================================
-//  GET LOGIN
-// ======================================================
+
+// DEBUG: Saber qué rutas entran acá
+
+router.use((req, res, next) => {
+  console.log(" userRoutes recibió:", req.method, req.url);
+  next();
+});
+
+// GET LOGIN (login2 temporal)
+
+router.get("/login2", (req, res) => {
+  res.render("login2", { error: null });
+});
+
+
+// GET LOGIN (login original)
+
 router.get("/login", (req, res) => {
   res.render("login", { error: null });
 });
 
-// ======================================================
-//  POST LOGIN
-// ======================================================
+
+// POST LOGIN
+
 router.post("/login", (req, res) => {
   const { correo, contrasena } = req.body;
 
-  if (!correo || !contrasena)
-    return res.status(400).render("login", { error: "Debes ingresar correo y contraseña" });
+  console.log(" POST /login BODY:", req.body);
 
-  const sql = "SELECT * FROM usuarios WHERE correo = ? AND contraseña = ?";
+  if (!correo || !contrasena) {
+    return res.render("login", { error: "Debes ingresar correo y contraseña" });
+  }
+
+  const sql = "SELECT * FROM usuarios WHERE correo = ? AND contrasena = ?";
+
   db.query(sql, [correo, contrasena], (err, results) => {
-    if (err)
-      return res.status(500).render("login", { error: "Error interno en la base de datos" });
+    if (err) {
+      console.error(" Error DB:", err);
+      return res.render("login", { error: "Error en la base de datos" });
+    }
 
-    if (results.length === 0)
-      return res.status(401).render("login", { error: "Correo o contraseña incorrectos" });
+    if (results.length === 0) {
+      console.log(" Usuario NO encontrado");
+      return res.render("login", { error: "Correo o contraseña incorrectos" });
+    }
 
     const usuario = results[0];
-    delete usuario.contraseña;
 
-    return res.redirect(`/menu?user=${usuario.nombre}`);
+    // Guardar sesión
+    req.session.user = {
+      id: usuario.id_usuario,
+      nombre: usuario.nombre,
+      correo: usuario.correo,
+      rol: usuario.rol
+    };
+
+    console.log(" Usuario logueado:", req.session.user);
+
+    return res.redirect("/menu");
   });
 });
 
-// ======================================================
-//  GET REGISTER
-// ======================================================
+
+// LOGOUT
+
+router.get("/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.redirect("/login");
+  });
+});
+
+// GET REGISTER
+
 router.get("/register", (req, res) => {
   res.render("register", { error: null });
 });
 
-// ======================================================
-//  POST REGISTER
-// ======================================================
+
+// POST REGISTER
+
 router.post("/register", (req, res) => {
   const { nombre, correo, contrasena } = req.body;
 
-  if (!nombre || !correo || !contrasena)
-    return res.status(400).render("register", { error: "Todos los campos son obligatorios" });
+  if (!nombre || !correo || !contrasena) {
+    return res.render("register", { error: "Todos los campos son obligatorios" });
+  }
 
+  // Ver si el correo ya existe
   const sqlCheck = "SELECT * FROM usuarios WHERE correo = ?";
   db.query(sqlCheck, [correo], (err, results) => {
-    if (err)
-      return res.status(500).render("register", { error: "Error en la base de datos" });
+    if (err) {
+      console.error(" Error DB:", err);
+      return res.render("register", { error: "Error en la base de datos" });
+    }
 
-    if (results.length > 0)
-      return res.status(400).render("register", { error: "Correo ya registrado" });
+    if (results.length > 0) {
+      return res.render("register", { error: "Correo ya registrado" });
+    }
 
-    const sqlInsert = "INSERT INTO usuarios (nombre, correo, contraseña) VALUES (?, ?, ?)";
+    const sqlInsert = "INSERT INTO usuarios (nombre, correo, contrasena) VALUES (?, ?, ?)";
+
     db.query(sqlInsert, [nombre, correo, contrasena], (err2) => {
-      if (err2)
-        return res.status(500).render("register", { error: "Error al crear usuario" });
+      if (err2) {
+        console.error(" Error insertando usuario:", err2);
+        return res.render("register", { error: "Error al crear usuario" });
+      }
 
       return res.redirect("/login");
     });
-  });
-});
-
-// ======================================================
-//  GET FORGOT PASSWORD
-// ======================================================
-router.get("/forgot", (req, res) => {
-  res.render("forgot", { error: null, mensaje: null });
-});
-
-// ======================================================
-//  POST FORGOT PASSWORD (SIMULADO)
-// ======================================================
-router.post("/forgot", (req, res) => {
-  const { correo } = req.body;
-
-  if (!correo)
-    return res.status(400).render("forgot", { error: "Ingresa un correo" });
-
-  const sql = "SELECT * FROM usuarios WHERE correo = ?";
-  db.query(sql, [correo], (err, results) => {
-    if (err)
-      return res.status(500).render("forgot", { error: "Error en la base de datos" });
-
-    if (results.length === 0)
-      return res.status(404).render("forgot", { error: "Correo no encontrado" });
-
-    const token = crypto.randomBytes(20).toString("hex");
-
-    return res.render("forgot", {
-      mensaje: `Simulación: haz click aquí para restablecer tu contraseña: 
-                <a href="/reset-password/${token}">Restablecer contraseña</a>`,
-      error: null
-    });
-  });
-});
-
-// ======================================================
-//  GET RESET PASSWORD
-// ======================================================
-router.get("/reset-password/:token", (req, res) => {
-  const { token } = req.params;
-  res.render("reset", { token, error: null, mensaje: null });
-});
-
-// ======================================================
-//  POST RESET PASSWORD (SIMULADO)
-// ======================================================
-router.post("/reset-password/:token", (req, res) => {
-  const { token } = req.params;
-  const { contrasena } = req.body;
-
-  if (!contrasena)
-    return res.render("reset", { token, error: "Ingresa una contraseña", mensaje: null });
-
-  const sql = "UPDATE usuarios SET contraseña = ? ORDER BY id ASC LIMIT 1";
-
-  db.query(sql, [contrasena], (err) => {
-    if (err)
-      return res.render("reset", { token, error: "Error al actualizar", mensaje: null });
-
-    return res.render("reset", {
-      token,
-      mensaje: "Contraseña actualizada correctamente. Ya puedes iniciar sesión.",
-      error: null
-    });
-  });
-});
-
-// ======================================================
-//  GET MENU (PANTALLA PRINCIPAL)
-// ======================================================
-router.get("/menu", (req, res) => {
-  const userName = req.query.user ?? "Invitado";
-
-  const mockProducts = [
-    { name: "La Classic", price: "$45.900", desc: "La más consentida", img: "/img/gorra1.jpg" },
-    { name: "Trucker", price: "$48.500", desc: "Estilo clásico", img: "/img/gorra2.jpg" },
-    { name: "Blue Skies Cap", price: "$54.300", desc: "Estilo fresco", img: "/img/gorra3.jpg" },
-    { name: "Red Edition", price: "$49.900", desc: "Color potente", img: "/img/gorra4.jpg" },
-  ];
-
-  res.render("menu", {
-    userName,
-    products: mockProducts
   });
 });
 

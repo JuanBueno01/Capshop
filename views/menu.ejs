@@ -44,62 +44,120 @@
         }
 
         /* ============================
+          EVITAR SCROLL HORIZONTAL
+        ============================ */
+        html, body {
+            overflow-x: hidden;
+        }
+
+        /* ============================
           NAVBAR
         ============================ */
+        .navbar-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
         .navbar {
-          width: 100%;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 18px 40px;
-          background: rgba(255, 255, 255, 0.25);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          position: sticky;
-          top: 0;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            width: 100%;
+            max-width: 1350px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 22px;
+            box-sizing: border-box;
         }
 
         .nav-left {
-          display: flex;
-          align-items: center;
-          gap: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .logo {
-          width: 77px;
-          height: 77px;
-          border-radius: 50%;
-          object-fit: cover;
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 50%;
         }
 
         .brand {
-          font-weight: bold;
-          font-size: 26px;
-          color: #6a00d7;
+            font-weight: bold;
+            font-size: 26px;
+            color: #6a00d7;
+        }
+
+        .nav-links {
+            display: flex;
+            flex: 1;
+            justify-content: center;
+            gap: 30px;
         }
 
         .nav-links a {
-          margin: 0 14px;
-          text-decoration: none;
-          color: #222;
-          font-weight: 700;
+            text-decoration: none;
+            color: #222;
+            font-weight: 700;
+            font-size: 18px;
+            transition: 0.25s ease;
         }
 
         .nav-links a:hover {
-          color: #6a00d7;
+            color: #8a2fff;
+        }
+
+        .nav-right {
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .user-tag {
-          margin-right: 35px;
+            font-size: 16px;
         }
 
         .btn-logout {
-          padding: 8px 14px;
-          background: #6a00d7;
-          color: white;
-          border-radius: 8px;
-          text-decoration: none;
+            background: #8a2fff;
+            padding: 8px 14px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.25s ease;
+        }
+
+        .btn-logout:hover {
+            background: #a462ff;
+        }
+
+        @media (max-width: 820px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 12px;
+                padding-bottom: 20px;
+            }
+
+            .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                margin-top: 10px;
+                gap: 20px;
+            }
+
+            .logo {
+                width: 60px;
+                height: 60px;
+            }
         }
 
         /* ============================
@@ -162,8 +220,8 @@
           width: 90%;
           margin: auto;
           display: grid;
-          grid-template-columns: repeat(4, 220px); /* más pequeñas */
-          justify-content: center; /* centra todo */
+          grid-template-columns: repeat(4, 220px);
+          justify-content: center;
           gap: 25px;
           padding-bottom: 50px;
         }
@@ -178,6 +236,8 @@
 
         .card img {
           width: 100%;
+          height: 180px;
+          object-fit: contain;
           border-radius: 12px;
         }
 
@@ -190,9 +250,6 @@
           font-weight: bold;
         }
 
-        /* ============================
-          BOTONES LADO A LADO
-        ============================ */
         .card-buttons {
           display: flex;
           gap: 10px;
@@ -201,73 +258,60 @@
 
         .btn-add,
         .btn-detail {
-          width: 50%; /* uno al lado del otro */
           padding: 10px;
           border-radius: 8px;
           cursor: pointer;
+          border: none;
         }
 
         .btn-add {
-          border: none;
+          width: 100%;
           background: #6a00d7;
           color: white;
         }
 
         .btn-detail {
+          background: white;
           border: 2px solid #6a00d7;
           color: #6a00d7;
-          background: white;
-        }
-
-        /* ============================
-          PAGINACIÓN
-        ============================ */
-        .pagination {
           text-align: center;
-          margin: 20px 0;
+          width: 100%;
+          display: inline-block;
+          text-decoration: none;
         }
-
-        .pagination span {
-          margin: 0 7px;
-          padding: 8px 12px;
-          border-radius: 6px;
-          cursor: pointer;
-        }
-
-        .pagination .active {
-          background: #6a00d7;
-          color: white;
-        }
-
     </style>
 </head>
 
 <body>
 
     <!-- NAVBAR -->
-    <header class="navbar">
+    <header class="navbar-container">
+    <div class="navbar">
+
         <div class="nav-left">
             <img src="/img/perro.jpg" class="logo">
             <h2 class="brand">CapXhop</h2>
         </div>
 
         <nav class="nav-links">
-            <a href="#">Inicio</a>
-            <a href="#">Catálogo</a>
-            <a href="#">Carrito</a>
+            <a href="/">Inicio</a>
+            <a href="/menu">Catálogo</a>
+            <a href="/carrito">Carrito</a>
         </nav>
 
         <div class="nav-right">
-            <span class="user-tag">Bienvenido, <%= userName || "Invitado" %></span>
+            <span class="user-tag">Bienvenido, <%= userName %></span>
             <a href="/logout" class="btn-logout">Cerrar sesión</a>
         </div>
-    </header>
+
+    </div>
+</header>
 
     <!-- BANNER -->
     <section class="banner">
         <h1>Gorras para todos los estilos</h1>
         <p>Envío gratis en compras superiores a $52.900</p>
-        <a class="cta" href="#">Ver catálogo</a>
+        <a class="cta" href="#grid">Ver catálogo</a>
     </section>
 
     <!-- SEARCH / FILTER BAR -->
@@ -279,29 +323,37 @@
     </section>
 
     <!-- PRODUCT GRID -->
-    <section class="grid">
+    <section id="grid" class="grid">
+
         <% products.forEach(p => { %>
             <div class="card">
-              <img src="<%= p.img %>" alt="<%= p.name %>">
-              <h3><%= p.name %></h3>
-              <p class="price"><%= p.price %></p>
-              <p class="desc"><%= p.desc %></p>
 
-              <div class="card-buttons">
-                  <button class="btn-add">Agregar al carrito</button>
-                  <button class="btn-detail">Ver detalle</button>
-              </div>
+                <img src="/img/<%= p.imagen %>" alt="<%= p.nombre %>">
+
+                <h3><%= p.nombre %></h3>
+
+                <p class="price">$<%= p.precio %></p>
+
+                <p class="desc"><%= p.descripcion %></p>
+
+                <div class="card-buttons">
+
+                    <div style="width: 50%;">
+                        <form action="/add-to-cart/<%= p.id_producto %>" method="POST">
+                            <button type="submit" class="btn-add">Agregar al carrito</button>
+                        </form>
+                    </div>
+
+                    <a href="/product/<%= p.id_producto %>" class="btn-detail">
+                        Ver detalle
+                    </a>
+
+                </div>
+
             </div>
         <% }) %>
-    </section>
 
-    <!-- PAGINATION -->
-    <div class="pagination">
-        <span class="active">1</span>
-        <span>2</span>
-        <span>3</span>
-        <span>...</span>
-    </div>
+    </section>
 
 </body>
 </html>
